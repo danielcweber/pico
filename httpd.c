@@ -33,12 +33,10 @@ void serve_forever(const char *PORT) {
 
   int slot = 0;
 
-  printf("Server started %shttp://127.0.0.1:%s%s\n", "\033[92m", PORT,
-         "\033[0m");
+  printf("Server started %shttp://127.0.0.1:%s%s\n", "\033[92m", PORT, "\033[0m");
 
   // create shared memory for client slot array
-  clients = mmap(NULL, sizeof(*clients) * MAX_CONNECTIONS,
-                 PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
+  clients = mmap(NULL, sizeof(*clients) * MAX_CONNECTIONS,  PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
 
   // Setting all elements to -1: signifies there is no client connected
   int i;
@@ -110,20 +108,6 @@ void start_server(const char *port) {
     exit(1);
   }
 }
-
-// get request header by name
-char *request_header(const char *name) {
-  header_t *h = reqhdr;
-  while (h->name) {
-    if (strcmp(h->name, name) == 0)
-      return h->value;
-    h++;
-  }
-  return NULL;
-}
-
-// get all request headers
-header_t *request_headers(void) { return reqhdr; }
 
 // client connection
 void respond(int slot) {
