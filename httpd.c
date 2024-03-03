@@ -25,7 +25,6 @@ static char *buf;
 // Client request
 char *method, // "GET" or "POST"
     *uri,     // "/index.html" things before '?'
-    *qs,      // "a=1&b=2" things after  '?'
     *prot;    // "HTTP/1.1"
 
 void serve_forever(const char *PORT) {
@@ -126,34 +125,6 @@ char *request_header(const char *name) {
 // get all request headers
 header_t *request_headers(void) { return reqhdr; }
 
-// Handle escape characters (%xx)
-static void uri_unescape(char *uri) {
-  char chr = 0;
-  char *src = uri;
-  char *dst = uri;
-
-  // Skip inital non encoded character
-  while (*src && !isspace((int)(*src)) && (*src != '%'))
-    src++;
-
-  // Replace encoded characters with corresponding code.
-  dst = src;
-  while (*src && !isspace((int)(*src))) {
-    if (*src == '+')
-      chr = ' ';
-    else if ((*src == '%') && src[1] && src[2]) {
-      src++;
-      chr = ((*src & 0x0F) + 9 * (*src > '9')) * 16;
-      src++;
-      chr += ((*src & 0x0F) + 9 * (*src > '9'));
-    } else
-      chr = *src;
-    *dst++ = chr;
-    src++;
-  }
-  *dst = '\0';
-}
-
 // client connection
 void respond(int slot) {
   int rcvd;
@@ -173,16 +144,7 @@ void respond(int slot) {
     uri = strtok(NULL, " \t");
     prot = strtok(NULL, " \t\r\n");
 
-    uri_unescape(uri);
-
     fprintf(stderr, "\x1b[32m + [%s] %s\x1b[0m\n", method, uri);
-
-    qs = strchr(uri, '?');
-
-    if (qs)
-      *qs++ = '\0'; // split URI
-    else
-      qs = uri - 1; // use an empty string
 
     // bind clientfd to stdout, making it easier to write
     int clientfd = clients[slot];
