@@ -10,14 +10,12 @@ int main(int c, char **v) {
 }
 
 void route() {
-  ROUTE_START()
-
-  GET(uri) {
-
-    HTTP_302;
-    printf("Content-Length: 0\n");
-    printf("Location: https://github.com%s\n\n", uri);
-  }
-
-  ROUTE_END()
+    if (strcmp("GET", method) == 0)
+    {
+        printf("%s 302 Found\n", prot);
+        printf("Content-Length: 0\n");
+        printf("Location: https://github.com%s\n\n", uri);
+    }
+    else
+        printf("%s 403 Forbidden\n\n", prot);
 }

@@ -28,25 +28,4 @@ header_t *request_headers(void);
 
 void route();
 
-// Response
-#define RESPONSE_PROTOCOL "HTTP/1.1"
-
-#define HTTP_200 printf("%s 200 OK\n\n", prot)
-#define HTTP_201 printf("%s 201 Created\n\n", prot)
-#define HTTP_302 printf("%s 302 Found\n", prot)
-#define HTTP_404 printf("%s 404 Not found\n\n", prot)
-#define HTTP_500 printf("%s 500 Internal Server Error\n\n", prot)
-#define HTTP_403 printf("%s 403 Forbidden\n\n", prot)
-
-// some interesting macro for `route()`
-#define ROUTE_START() if (0) {
-#define ROUTE(METHOD, URI)                                                     \
-  }                                                                            \
-  else if (strcmp(URI, uri) == 0 && strcmp(METHOD, method) == 0) {
-#define GET(URI) ROUTE("GET", URI)
-#define POST(URI) ROUTE("POST", URI)
-#define ROUTE_END()                                                            \
-  }                                                                            \
-  else HTTP_403;
-
 #endif
