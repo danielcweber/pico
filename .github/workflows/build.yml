@@ -1,0 +1,64 @@
+name: Build Docker image
+
+on:
+  push:
+    branches:
+      - 'fork'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Determine semantic version
+        uses: dotnet/nbgv@master
+        id: nbgv
+        with:
+          setAllVars: true
+
+      - name: Set versions
+        run: |
+          echo "version1=${{steps.nbgv.outputs.VersionMajor}}" >> $GITHUB_ENV
+          echo "version2=${{steps.nbgv.outputs.VersionMajor}}.${{steps.nbgv.outputs.VersionMinor}}" >> $GITHUB_ENV
+          echo "version3=${{steps.nbgv.outputs.VersionMajor}}.${{steps.nbgv.outputs.VersionMinor}}.${{steps.nbgv.outputs.BuildNumber}}" >> $GITHUB_ENV
+          echo "version4=${{steps.nbgv.outputs.VersionMajor}}.${{steps.nbgv.outputs.VersionMinor}}.${{steps.nbgv.outputs.BuildNumber}}${{steps.nbgv.outputs.PrereleaseVersion}}" >> $GITHUB_ENV
+          echo "version5=${{steps.nbgv.outputs.VersionMajor}}.${{steps.nbgv.outputs.VersionMinor}}.${{steps.nbgv.outputs.BuildNumber}}${{steps.nbgv.outputs.PrereleaseVersion}}.${{steps.nbgv.outputs.VersionHeight}}" >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Dockerfile
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          file: Dockerfile
+          build-args: |
+            version=${{ env.version4 }}
+            versionHeight=${{steps.nbgv.outputs.VersionHeight}}
+          tags: |
+            ghcr.io/danielcweber/pico-redirect:${{ env.version1 }}
+            ghcr.io/danielcweber/pico-redirect:${{ env.version2 }}
+            ghcr.io/danielcweber/pico-redirect:${{ env.version3 }}
+            ghcr.io/danielcweber/pico-redirect:${{ env.version4 }}
+            ghcr.io/danielcweber/pico-redirect:${{ env.version5 }}
+
+      - name: Bump version and push tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          custom_tag: ${{ env.version5 }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
