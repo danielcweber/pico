@@ -146,7 +146,7 @@ void respond(int slot, const char* redirect_target)
     if (rcvd < 0) // receive error
         fprintf(stderr, ("recv() error\n"));
     else if (rcvd == 0) // receive socket closed
-        fprintf(stderr, "Client disconnected upexpectedly.\n");
+        fprintf(stderr, "Client disconnected unexpectedly.\n");
     else // message received
     {
         buf[rcvd] = '\0';
