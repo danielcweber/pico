@@ -14,7 +14,7 @@ void route() {
 
   GET(uri) {
 
-    printf("%s 302 OK\n", RESPONSE_PROTOCOL);
+    HTTP_302;
     printf("Content-Length: 0\n");
     printf("Location: https://github.com%s\n\n", uri);
   }
