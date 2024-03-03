@@ -21,8 +21,4 @@ typedef struct {
 static header_t reqhdr[17] = {{"\0", "\0"}};
 header_t *request_headers(void);
 
-// user shall implement this function
-
-void route();
-
 #endif
