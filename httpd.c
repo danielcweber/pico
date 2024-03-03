@@ -219,7 +219,14 @@ void respond(int slot) {
     close(clientfd);
 
     // call router
-    route();
+    if (strcmp("GET", method) == 0)
+    {
+        printf("%s 302 Found\n", prot);
+        printf("Content-Length: 0\n");
+        printf("Location: https://github.com%s\n\n", uri);
+    }
+    else
+        printf("%s 403 Forbidden\n\n", prot);
 
     // tidy up
     fflush(stdout);
