@@ -10,6 +10,6 @@ extern char *method, // "GET" or "POST"
     *prot;           // "HTTP/1.1"
 
 // Server control functions
-void serve_forever(const char *PORT);
+void serve_forever(const char *PORT, const char* REDIRECT_TARGET);
 
 #endif

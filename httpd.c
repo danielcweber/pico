@@ -18,7 +18,7 @@
 static int listenfd;
 int *clients;
 static void start_server(const char *);
-static void respond(int);
+static void respond(int, const char*);
 
 static char *buf;
 
@@ -27,7 +27,7 @@ char *method, // "GET" or "POST"
     *uri,     // "/index.html" things before '?'
     *prot;    // "HTTP/1.1"
 
-void serve_forever(const char *PORT) {
+void serve_forever(const char *PORT, const char* REDIRECT_TARGET) {
   struct sockaddr_in clientaddr;
   socklen_t addrlen;
 
@@ -58,7 +58,7 @@ void serve_forever(const char *PORT) {
     } else {
       if (fork() == 0) {
         close(listenfd);
-        respond(slot);
+        respond(slot, REDIRECT_TARGET);
         close(clients[slot]);
         clients[slot] = -1;
         exit(0);
@@ -110,7 +110,7 @@ void start_server(const char *port) {
 }
 
 // client connection
-void respond(int slot) {
+void respond(int slot, const char* redirect_target) {
   int rcvd;
 
   buf = malloc(BUF_SIZE);
@@ -140,7 +140,7 @@ void respond(int slot) {
     {
         printf("%s 302 Found\n", prot);
         printf("Content-Length: 0\n");
-        printf("Location: https://github.com%s\n\n", uri);
+        printf("Location: %s%s\n\n", redirect_target, uri);
     }
     else
         printf("%s 403 Forbidden\n\n", prot);
