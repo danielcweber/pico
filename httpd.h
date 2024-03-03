@@ -8,10 +8,7 @@
 extern char *method, // "GET" or "POST"
     *uri,            // "/index.html" things before '?'
     *qs,             // "a=1&b=2" things after  '?'
-    *prot,           // "HTTP/1.1"
-    *payload;        // for POST
-
-extern int payload_size;
+    *prot;           // "HTTP/1.1"
 
 // Server control functions
 void serve_forever(const char *PORT);

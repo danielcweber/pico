@@ -26,10 +26,7 @@ static char *buf;
 char *method, // "GET" or "POST"
     *uri,     // "/index.html" things before '?'
     *qs,      // "a=1&b=2" things after  '?'
-    *prot,    // "HTTP/1.1"
-    *payload; // for POST
-
-int payload_size;
+    *prot;    // "HTTP/1.1"
 
 void serve_forever(const char *PORT) {
   struct sockaddr_in clientaddr;
@@ -186,32 +183,6 @@ void respond(int slot) {
       *qs++ = '\0'; // split URI
     else
       qs = uri - 1; // use an empty string
-
-    header_t *h = reqhdr;
-    char *t, *t2;
-    while (h < reqhdr + 16) {
-      char *key, *val;
-
-      key = strtok(NULL, "\r\n: \t");
-      if (!key)
-        break;
-
-      val = strtok(NULL, "\r\n");
-      while (*val && *val == ' ')
-        val++;
-
-      h->name = key;
-      h->value = val;
-      h++;
-      fprintf(stderr, "[H] %s: %s\n", key, val);
-      t = val + 1 + strlen(val);
-      if (t[1] == '\r' && t[2] == '\n')
-        break;
-    }
-    t = strtok(NULL, "\r\n");
-    t2 = request_header("Content-Length"); // and the related header if there is
-    payload = t;
-    payload_size = t2 ? atol(t2) : (rcvd - (t - buf));
 
     // bind clientfd to stdout, making it easier to write
     int clientfd = clients[slot];
