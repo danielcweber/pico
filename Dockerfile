@@ -1,16 +1,14 @@
 FROM muslcc/i686:x86_64-linux-musl AS build
 
 RUN apk update && \
-    apk add make git
+    apk add make
 
 WORKDIR /usr/src/
-RUN git clone -b fork https://github.com/danielcweber/pico.git
-
-WORKDIR pico
+COPY src .
 RUN make
 
 
 FROM scratch
-COPY --from=build /usr/src/pico/server /usr/bin/http-redirect
+COPY --from=build /usr/src/server /usr/bin/http-redirect
 
 ENTRYPOINT [ "/usr/bin/http-redirect" ]
